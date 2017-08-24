@@ -80,7 +80,7 @@ chef_user_record(AzId, _Admin) ->
 
 insert_user_data() ->
     Users = [make_user(<<"user01">>), make_user(<<"user02">>)],
-    Expected = lists:duplicate(length(Users), {ok, 1}),
+    Expected = lists:duplicate(length(Users), {ok,[[{<<"add_user">>,<<>>}]]}),
     Results = [itest_util:create_record(User) || User <- Users],
     ?assertEqual(Expected, Results).
 
@@ -88,13 +88,13 @@ fetch_user_data() ->
     Expected = make_user(<<"user03">>),
     Username = Expected#chef_user.username,
     %% Make sure client create succeeds
-    ?assertEqual({ok, 1}, itest_util:create_record(Expected)),
+    ?assertEqual({ok,[[{<<"add_user">>,<<>>}]]}, itest_util:create_record(Expected)),
     Result = chef_db:fetch(#chef_user{username = Username}, chef_db:make_context(?API_MIN_VER, <<"ABCD">>)),
     ?assertEqual(Expected, Result).
 
 fetch_user_list() ->
     Users = [make_user(<<"user04">>), make_user(<<"user05">>)],
-    CreatedResults = lists:duplicate(length(Users), {ok, 1}),
+    CreatedResults = lists:duplicate(length(Users), {ok,[[{<<"add_user">>,<<>>}]]}),
     Created = [itest_util:create_record(User) || User <- Users ],
     ?assertEqual(CreatedResults, Created),
 
@@ -104,7 +104,7 @@ fetch_user_list() ->
 
 delete_user_data() ->
     User = make_user(<<"user06">>),
-    ?assertEqual({ok, 1}, itest_util:create_record(User)),
+    ?assertEqual({ok,[[{<<"add_user">>,<<>>}]]}, itest_util:create_record(User)),
     Result = itest_util:delete_record(User),
     ?assertEqual({ok, 1}, Result),
     Username = User#chef_user.username,
@@ -113,7 +113,7 @@ delete_user_data() ->
 
 update_user_data() ->
     User = make_user(<<"user07">>),
-    ?assertEqual({ok, 1}, itest_util:create_record(User)),
+    ?assertEqual({ok,[[{<<"add_user">>,<<>>}]]}, itest_util:create_record(User)),
 
     %% Check that public key we inserted is correct
     Username = User#chef_user.username,
@@ -123,7 +123,7 @@ update_user_data() ->
     %% Update public key
     UpdatedUserData = User#chef_user{ public_key = ?OTHER_PUBLIC_KEY },
     Result = itest_util:update_record(UpdatedUserData),
-    ?assertEqual({ok, 1}, Result),
+    ?assertEqual(ok, Result),
 
     %% Did the public key really update?
     PersistedUser = chef_db:fetch(#chef_user{username = Username}, chef_db:make_context(?API_MIN_VER, <<"ABCD">>)),
@@ -134,6 +134,6 @@ update_user_data() ->
 
 count_admin_users() ->
     User = make_admin_user(<<"user08">>),
-    ?assertEqual({ok, 1}, itest_util:create_record(User)),
+    ?assertEqual({ok,[[{<<"add_user">>,<<>>}]]}, itest_util:create_record(User)),
     User2 = make_admin_user(<<"user09">>),
-    ?assertEqual({ok, 1}, itest_util:create_record(User2)).
+    ?assertEqual({ok,[[{<<"add_user">>,<<>>}]]}, itest_util:create_record(User2)).

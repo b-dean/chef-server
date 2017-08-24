@@ -155,7 +155,6 @@ make_context(ApiVersion, ReqId) ->
 make_context(ApiVersion, ReqId, Darklaunch) ->
     #context{server_api_version = ApiVersion, reqid = ReqId, darklaunch = Darklaunch}.
 
-
 -spec create(object_rec(), #context{}, object_id()) -> ok | {conflict, term()} | {error, term()}.
 create(#chef_cookbook_version{} = Record, DbContext, ActorId) ->
     create_object(DbContext, create_cookbook_version, Record, ActorId);
@@ -167,6 +166,7 @@ create(ObjectRec0, #context{server_api_version = ApiVersion, reqid = ReqId}, Act
     Fields = chef_object:fields_for_insert(ObjectRec2),
     case stats_hero:ctime(ReqId, {chef_sql, create_object},
                           fun() -> chef_sql:create_object(QueryName, Fields) end) of
+        {ok,[[{<<"add_user">>,<<>>}]]} -> ok;
         {ok, 1} -> ok;
         {conflict, Msg}-> {conflict, Msg};
         {error, Why} -> {error, Why}
@@ -258,6 +258,7 @@ update(#chef_cookbook_version{org_id =OrgId} = Record, #context{reqid = ReqId} =
 update(ObjectRec, #context{reqid = ReqId}, ActorId) ->
     case stats_hero:ctime(ReqId, {chef_sql, do_update},
                           fun() -> chef_sql:update(ObjectRec, ActorId) end) of
+        [[{<<"update_user">>, <<>>}]] -> ok;
         N when is_integer(N), N > 0 -> ok;
         not_found -> not_found;
         {conflict, Message} -> {conflict, Message};

@@ -71,7 +71,7 @@ start_db(Config, DbName) ->
     %% fail
     CmdsResult = chef_test_suite_helper:run_cmds(CMDS),
     % make sure it's seen in output, don't use lager.
-    ct:pal("db_start: ~n~p~n", [CmdsResult]),
+    io:format(user, "db_start: ~n~p~n", [CmdsResult]),
 
     Statements = case ?config(statements, Config) of
                      undefined ->
